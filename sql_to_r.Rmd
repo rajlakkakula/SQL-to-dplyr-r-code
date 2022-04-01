@@ -1,0 +1,71 @@
+---
+title: "SQL-to-R Code"
+author: Prithviraj Lakkakula
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+    theme: cosmo
+  pdf_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+<!--
+:::: {style="display: grid;"} ### this code if you add below will display one after the other top and bottom.
+
+#For more info, see here: https://bookdown.org/yihui/rmarkdown-cookbook/multi-column.html
+-->
+
+In this post, I will query the data from different data tables in both SQL and R's dplyr with a goal of obtaining the same output. SQL code will be on the your left and R code will be on your right. 
+
+This is a work in progress as I continue to add the queries in the coming weeks starting with simple queries to more complicated queries. 
+
+Note: In the html file, two columns appear side by side but in pdf version you can view the code only one after the other (not side by side).
+
+### Query No. 1
+
+:::: {style="display: flex;"}
+
+::: {}
+Here is the **first** Div.
+
+```{r}
+## SQL Code will come here
+```
+:::
+
+::: {}
+And this block will be put on the right:
+
+```{r}
+## R code will go here
+```
+:::
+
+::::
+
+<!--
+### Query No. 2
+
+:::: {style="display: flex;"}
+
+::: {}
+Here is the **first** Div.
+
+```{r}
+str(iris)
+```
+:::
+
+::: {}
+And this block will be put on the right:
+
+```{r}
+plot(iris[, -5])
+```
+:::
+
+::::
+-->
+
