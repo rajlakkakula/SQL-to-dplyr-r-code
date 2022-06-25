@@ -45,27 +45,5 @@ And this block will be put on the right:
 
 ::::
 
-<!--
-### Query No. 2
 
-:::: {style="display: flex;"}
-
-::: {}
-Here is the **first** Div.
-
-```{r}
-str(iris)
-```
-:::
-
-::: {}
-And this block will be put on the right:
-
-```{r}
-plot(iris[, -5])
-```
-:::
-
-::::
--->
 
