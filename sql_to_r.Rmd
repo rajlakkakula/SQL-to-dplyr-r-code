@@ -2,13 +2,13 @@
 title: "SQL-to-R Code"
 author: Prithviraj Lakkakula
 output: 
-  pdf_document: 
-    toc: yes
-    highlight: zenburn
   html_document: 
     toc: yes
     highlight: zenburn
     theme: cosmo
+  pdf_document: 
+    toc: yes
+    highlight: zenburn
 ---
 
 <!--
@@ -618,3 +618,260 @@ films %>%
 ::::
 
 ## Query 9: Use WHERE and AND for multiple conditions
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets the titles of films released between 1994 and 2000.
+
+```{sql, connection=con}
+SELECT title
+FROM films
+WHERE release_year > 1994
+AND release_year < 2000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Gets the titles of films released between 1994 and 2000.
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(release_year > 1994 &
+           release_year < 2000) %>% 
+  select(title) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the title and release year for all Spanish language films released before 2000
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE language = 'Spanish'
+AND release_year < 2000;
+```
+
+:::
+
+::: {}
+R code: Get the title and release year for all Spanish language films released before 2000
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(language ==  "Spanish" &
+           release_year < 2000) %>% 
+  select(title, release_year)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get all details for Spanish language films released after 2000, but before 2010.
+
+```{sql, connection=con}
+SELECT *
+FROM films
+WHERE language = 'Spanish'
+AND release_year > 2000
+AND release_year < 2010
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get all details for Spanish language films released after 2000, but before 2010.
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(language ==  "Spanish" &
+           release_year > 2000 &
+           release_year < 2010) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+## Query 10: Use WHERE and OR for multiple conditions
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets all films release in either 1994 or 2000
+
+```{sql, connection=con}
+SELECT title
+FROM films
+WHERE release_year = 1994
+OR release_year = 2000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Gets all films release in either 1994 or 2000
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(release_year == 1994 |
+           release_year == 2000) %>%
+  select(title) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+## Query 11: Combining AND and OR with WHERE in SQL
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets all films release in either 1994 or 2000
+
+```{sql, connection=con}
+SELECT title
+FROM films
+WHERE (release_year = 1994 OR release_year = 1995)
+AND (certification = 'PG' OR certification = 'R')
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Gets all films release in either 1994 or 2000
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter((release_year == 1994 | release_year == 1995) &
+           (certification == "PG" | certification == "R")) %>%
+  select(title) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the title and release year for films released in the 90s.
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE release_year >= 1994 
+AND release_year < 2000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the title and release year for films released in the 90s.
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(release_year >= 1994 & release_year < 2000)  %>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: filter the records to only include French or Spanish language films in 1990s.
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE (release_year >= 1990 AND release_year < 2000)
+AND (language = 'French' OR language = 'Spanish')
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: filter the records to only include French or Spanish language films in 199Os.
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter((release_year >= 1990 & release_year < 2000) &
+           (language == "French" | language == "Spanish")) %>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: filter the records to only include French or Spanish language films in 1990s with gross greater than 2 million.
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE (release_year >= 1990 AND release_year < 2000)
+AND (language = 'French' OR language = 'Spanish')
+AND gross > 2000000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: filter the records to only include French or Spanish language films in 199Os with gross greater than 2 million.
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter((release_year >= 1990 & release_year < 2000) &
+           (language == "French" | language == "Spanish") &
+           gross > 2000000) %>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
