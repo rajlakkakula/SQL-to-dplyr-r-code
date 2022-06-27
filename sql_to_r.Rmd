@@ -2,13 +2,13 @@
 title: "SQL-to-R Code"
 author: Prithviraj Lakkakula
 output: 
+  pdf_document: 
+    toc: yes
+    highlight: zenburn
   html_document: 
     toc: yes
     highlight: zenburn
     theme: cosmo
-  pdf_document: 
-    toc: yes
-    highlight: zenburn
 ---
 
 <!--
@@ -23,27 +23,598 @@ This is a work in progress as I continue to add the queries in the coming weeks 
 
 Note: In the html file, two columns appear side by side but in pdf version you can view the code only one after the other (not side by side).
 
-### Query No. 1
+<!--
+## Populating the database (in-memory) with data
+-->
 
-:::: {style="display: flex;"}
+```{r echo = FALSE, message=FALSE}
+library(readxl)
+films <- read_excel("films.xlsx")
+people <- read.csv("people.csv")
+reviews <- read_excel("reviews.xlsx")
+roles <- read_excel("roles.xlsx")
+
+library(odbc)
+library(DBI)
+library(RSQL)
+library(RSQLite)
+library(tidyverse)
+
+con <- dbConnect(drv = RSQLite::SQLite(),
+                 dbname = ":memory:")
+
+dbWriteTable(conn = con,
+             name = "films",
+             value = films)
+dbWriteTable(conn = con,
+             name = "people",
+             value = people)
+dbWriteTable(conn = con,
+             name = "reviews",
+             value = reviews)
+dbWriteTable(conn = con,
+             name = "roles",
+             value = roles)
+#dbListTables(con)
+#dbListFields(con, "people")
+```
+
+
+## Query 1: SELECTing single columns
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
 
 ::: {}
-Here is the **first** Div.
 
-```{r}
-## SQL Code will come here
+SQL code
+
+```{sql, connection=con}
+SELECT name
+FROM people
+LIMIT 10;
 ```
+
 :::
 
 ::: {}
-And this block will be put on the right:
+R code
 
-```{r}
-## R code will go here
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  select(name) %>% 
+  head(n = 10)
 ```
 :::
 
 ::::
 
 
+## Query 2: SELECTing multiple columns
 
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT name, birthdate
+FROM people
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  select(name, birthdate) %>% 
+  head(n = 10)
+```
+:::
+
+::::
+
+## Query 3: SELECTing all columns
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT *
+FROM people
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  head(n = 10)
+```
+:::
+
+::::
+
+## Query 4: Excluding specific columns
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT id, name, birthdate
+FROM people
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  select(-deathdate) %>%
+  head(n = 10)
+```
+:::
+
+::::
+
+## Query 5: SELECTing DISTINCT columns
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT DISTINCT language
+FROM films
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  distinct(language) %>%
+  head(n = 10)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT DISTINCT country
+FROM films
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  distinct(country) %>%
+  head(n = 10)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT DISTINCT certification
+FROM films
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  distinct(certification) %>%
+  head(n = 10)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code
+
+```{sql, connection=con}
+SELECT DISTINCT role
+FROM roles
+LIMIT 10;
+```
+
+:::
+
+::: {}
+R code
+
+```{r warning=FALSE, message=FALSE}
+roles %>% 
+  distinct(role) %>%
+  head(n = 10)
+```
+:::
+
+::::
+
+## Query 6: Learning to COUNT
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Count the number of rows in `people` table
+
+```{sql, connection=con}
+SELECT COUNT(*)
+FROM people;
+```
+
+:::
+
+::: {}
+R code: Count the number of rows in `people` table
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  count() 
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Count the number of birth dates in the `people` table
+
+```{sql, connection=con}
+SELECT COUNT(birthdate)
+FROM people;
+```
+
+:::
+
+::: {}
+R code: Count the number of birth dates in the `people` table
+
+```{r warning=FALSE, message=FALSE}
+people %>% select(birthdate) %>%
+  count() 
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Count the number of DISTINCT birth dates in the `people` table
+
+```{sql, connection=con}
+SELECT COUNT(DISTINCT birthdate)
+FROM people;
+```
+
+:::
+
+::: {}
+R code: Count the number of DISTINCT birth dates in the `people` table
+
+```{r warning=FALSE, message=FALSE}
+people %>% select(birthdate) %>%
+  n_distinct()
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Count the number of DISTINCT languages in the `films` table
+
+```{sql, connection=con}
+SELECT COUNT(DISTINCT language)
+FROM films;
+```
+
+:::
+
+::: {}
+R code: Count the number of DISTINCT languages in the `films` table
+
+```{r warning=FALSE, message=FALSE}
+films %>% select(language) %>%
+  n_distinct()
+```
+:::
+
+::::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Count the number of DISTINCT languages in the `films` table
+
+```{sql, connection=con}
+SELECT COUNT(DISTINCT country)
+FROM films;
+```
+
+:::
+
+::: {}
+R code: Count the number of DISTINCT languages in the `films` table
+
+```{r warning=FALSE, message=FALSE}
+films %>% select(country) %>%
+  n_distinct()
+```
+:::
+
+::::
+
+
+## Query 7: Filtering of numeric values
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: selects all details for films with a budget over ten thousand dollars
+
+```{sql, connection=con}
+SELECT *
+FROM films
+WHERE budget > 10000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: selects all details for films with a budget over ten thousand dollars
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(budget > 10000) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: selects all details for all films released in 2016
+
+```{sql, connection=con}
+SELECT *
+FROM films
+WHERE release_year = 2016
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: selects all details for all films released in 2016
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(release_year == 2016) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: selects number of films released before 2000
+
+```{sql, connection=con}
+SELECT COUNT(release_year)
+FROM films
+WHERE release_year <2000;
+```
+
+:::
+
+::: {}
+R code: selects number of films released before 2000
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  count(release_year < 2000) 
+```
+:::
+
+::::
+
+## Query 8: Filtering text
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: gets the titles of all films which were filmed in China
+
+```{sql, connection=con}
+SELECT title
+FROM films
+WHERE country = 'China' -- in PostgreSQL you must use single quotes
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: gets the titles of all films which were filmed in China
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(country == "China") %>% # here you must use double quotes around text
+  select(title) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: gets all the details for all French language films
+
+```{sql, connection=con}
+SELECT *
+FROM films
+WHERE language = 'French' -- in PostgreSQL you must use single quotes
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: gets all the details for all French language films
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(language == "French") %>% # here you must use double quotes around text
+  head(n = 5)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the name and birth date of the person born on November 11th, 1974.
+
+```{sql, connection=con}
+SELECT name birthdate
+FROM people
+WHERE birthdate = '1974-11-11' -- in PostgreSQL you must use single quotes
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the name and birth date of the person born on November 11th, 1974.
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  select(name, birthdate) %>%
+  filter(birthdate == "1974-11-11") %>% # here you must use double quotes around text
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the number of Hindi language films
+
+```{sql, connection=con}
+SELECT COUNT(language)
+FROM films
+WHERE language = 'Hindi'; -- in PostgreSQL you must use single quotes
+```
+
+:::
+
+::: {}
+R code: Get the number of Hindi language films
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(language == "Hindi") %>% # here you must use double quotes around text
+  count()
+```
+:::
+
+::::
+
+## Query 9: Use WHERE and AND for multiple conditions

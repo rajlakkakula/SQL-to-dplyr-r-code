@@ -253,7 +253,15 @@ pre code {
 
 <div id="TOC">
 <ul>
-<li><a href="#query-no.-1">Query No. 1</a></li>
+<li><a href="#query-1-selecting-single-columns">Query 1: SELECTing single columns</a></li>
+<li><a href="#query-2-selecting-multiple-columns">Query 2: SELECTing multiple columns</a></li>
+<li><a href="#query-3-selecting-all-columns">Query 3: SELECTing all columns</a></li>
+<li><a href="#query-4-excluding-specific-columns">Query 4: Excluding specific columns</a></li>
+<li><a href="#query-5-selecting-distinct-columns">Query 5: SELECTing DISTINCT columns</a></li>
+<li><a href="#query-6-learning-to-count">Query 6: Learning to COUNT</a></li>
+<li><a href="#query-7-filtering-of-numeric-values">Query 7: Filtering of numeric values</a></li>
+<li><a href="#query-8-filtering-text">Query 8: Filtering text</a></li>
+<li><a href="#query-9-use-where-and-and-for-multiple-conditions">Query 9: Use WHERE and AND for multiple conditions</a></li>
 </ul>
 </div>
 
@@ -265,18 +273,1210 @@ pre code {
 <p>In this post, I will query the data from different data tables in both SQL and R’s dplyr with a goal of obtaining the same output. SQL code will be on the your left and R code will be on your right.</p>
 <p>This is a work in progress as I continue to add the queries in the coming weeks starting with simple queries to more complicated queries.</p>
 <p>Note: In the html file, two columns appear side by side but in pdf version you can view the code only one after the other (not side by side).</p>
-<div id="query-no.-1" class="section level3">
-<h3>Query No. 1</h3>
-<div style="display: flex;">
+<!--
+## Populating the database (in-memory) with data
+-->
+<div id="query-1-selecting-single-columns" class="section level2">
+<h2>Query 1: SELECTing single columns</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
 <div>
-<p>Here is the <strong>first</strong> Div.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## SQL Code will come here</span></span></code></pre></div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> name</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">50 Cent</td>
+</tr>
+<tr class="even">
+<td align="left">A. Michael Baldwin</td>
+</tr>
+<tr class="odd">
+<td align="left">A. Raven Cruz</td>
+</tr>
+<tr class="even">
+<td align="left">A.J. Buckley</td>
+</tr>
+<tr class="odd">
+<td align="left">A.J. DeLucia</td>
+</tr>
+<tr class="even">
+<td align="left">A.J. Langer</td>
+</tr>
+<tr class="odd">
+<td align="left">Aaliyah</td>
+</tr>
+<tr class="even">
+<td align="left">Aaron Ashmore</td>
+</tr>
+<tr class="odd">
+<td align="left">Aaron Hann</td>
+</tr>
+<tr class="even">
+<td align="left">Aaron Hill</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div>
-<p>And this block will be put on the right:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## R code will go here</span></span></code></pre></div>
+<p>R code</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##                  name
+## 1             50 Cent
+## 2  A. Michael Baldwin
+## 3       A. Raven Cruz
+## 4        A.J. Buckley
+## 5        A.J. DeLucia
+## 6         A.J. Langer
+## 7             Aaliyah
+## 8       Aaron Ashmore
+## 9          Aaron Hann
+## 10         Aaron Hill</code></pre>
 </div>
 </div>
+</div>
+<div id="query-2-selecting-multiple-columns" class="section level2">
+<h2>Query 2: SELECTing multiple columns</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> name, birthdate</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="left">birthdate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">50 Cent</td>
+<td align="left">7/6/75</td>
+</tr>
+<tr class="even">
+<td align="left">A. Michael Baldwin</td>
+<td align="left">4/4/63</td>
+</tr>
+<tr class="odd">
+<td align="left">A. Raven Cruz</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">A.J. Buckley</td>
+<td align="left">2/9/78</td>
+</tr>
+<tr class="odd">
+<td align="left">A.J. DeLucia</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">A.J. Langer</td>
+<td align="left">5/22/74</td>
+</tr>
+<tr class="odd">
+<td align="left">Aaliyah</td>
+<td align="left">1/16/79</td>
+</tr>
+<tr class="even">
+<td align="left">Aaron Ashmore</td>
+<td align="left">10/7/79</td>
+</tr>
+<tr class="odd">
+<td align="left">Aaron Hann</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Aaron Hill</td>
+<td align="left">4/23/83</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, birthdate) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##                  name birthdate
+## 1             50 Cent    7/6/75
+## 2  A. Michael Baldwin    4/4/63
+## 3       A. Raven Cruz          
+## 4        A.J. Buckley    2/9/78
+## 5        A.J. DeLucia          
+## 6         A.J. Langer   5/22/74
+## 7             Aaliyah   1/16/79
+## 8       Aaron Ashmore   10/7/79
+## 9          Aaron Hann          
+## 10         Aaron Hill   4/23/83</code></pre>
+</div>
+</div>
+</div>
+<div id="query-3-selecting-all-columns" class="section level2">
+<h2>Query 3: SELECTing all columns</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">name</th>
+<th align="left">birthdate</th>
+<th align="left">deathdate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">50 Cent</td>
+<td align="left">7/6/75</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">A. Michael Baldwin</td>
+<td align="left">4/4/63</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">A. Raven Cruz</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">A.J. Buckley</td>
+<td align="left">2/9/78</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">A.J. DeLucia</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">A.J. Langer</td>
+<td align="left">5/22/74</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">Aaliyah</td>
+<td align="left">1/16/79</td>
+<td align="left">8/25/01</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">Aaron Ashmore</td>
+<td align="left">10/7/79</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">Aaron Hann</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">Aaron Hill</td>
+<td align="left">4/23/83</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##    id               name birthdate deathdate
+## 1   1            50 Cent    7/6/75          
+## 2   2 A. Michael Baldwin    4/4/63          
+## 3   3      A. Raven Cruz                    
+## 4   4       A.J. Buckley    2/9/78          
+## 5   5       A.J. DeLucia                    
+## 6   6        A.J. Langer   5/22/74          
+## 7   7            Aaliyah   1/16/79   8/25/01
+## 8   8      Aaron Ashmore   10/7/79          
+## 9   9         Aaron Hann                    
+## 10 10         Aaron Hill   4/23/83</code></pre>
+</div>
+</div>
+</div>
+<div id="query-4-excluding-specific-columns" class="section level2">
+<h2>Query 4: Excluding specific columns</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, birthdate</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">name</th>
+<th align="left">birthdate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">50 Cent</td>
+<td align="left">7/6/75</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">A. Michael Baldwin</td>
+<td align="left">4/4/63</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">A. Raven Cruz</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">A.J. Buckley</td>
+<td align="left">2/9/78</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">A.J. DeLucia</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">A.J. Langer</td>
+<td align="left">5/22/74</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">Aaliyah</td>
+<td align="left">1/16/79</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">Aaron Ashmore</td>
+<td align="left">10/7/79</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">Aaron Hann</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">Aaron Hill</td>
+<td align="left">4/23/83</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>deathdate) <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##    id               name birthdate
+## 1   1            50 Cent    7/6/75
+## 2   2 A. Michael Baldwin    4/4/63
+## 3   3      A. Raven Cruz          
+## 4   4       A.J. Buckley    2/9/78
+## 5   5       A.J. DeLucia          
+## 6   6        A.J. Langer   5/22/74
+## 7   7            Aaliyah   1/16/79
+## 8   8      Aaron Ashmore   10/7/79
+## 9   9         Aaron Hann          
+## 10 10         Aaron Hill   4/23/83</code></pre>
+</div>
+</div>
+</div>
+<div id="query-5-selecting-distinct-columns" class="section level2">
+<h2>Query 5: SELECTing DISTINCT columns</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> language</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">language</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">German</td>
+</tr>
+<tr class="odd">
+<td align="left">English</td>
+</tr>
+<tr class="even">
+<td align="left">Japanese</td>
+</tr>
+<tr class="odd">
+<td align="left">Danish</td>
+</tr>
+<tr class="even">
+<td align="left">Italian</td>
+</tr>
+<tr class="odd">
+<td align="left">French</td>
+</tr>
+<tr class="even">
+<td align="left">Swedish</td>
+</tr>
+<tr class="odd">
+<td align="left">Russian</td>
+</tr>
+<tr class="even">
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(language) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 1
+##    language
+##    &lt;chr&gt;   
+##  1 &lt;NA&gt;    
+##  2 German  
+##  3 English 
+##  4 Japanese
+##  5 Danish  
+##  6 Italian 
+##  7 French  
+##  8 Swedish 
+##  9 Russian 
+## 10 None</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> country</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">country</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">USA</td>
+</tr>
+<tr class="even">
+<td align="left">Germany</td>
+</tr>
+<tr class="odd">
+<td align="left">Japan</td>
+</tr>
+<tr class="even">
+<td align="left">Denmark</td>
+</tr>
+<tr class="odd">
+<td align="left">UK</td>
+</tr>
+<tr class="even">
+<td align="left">Italy</td>
+</tr>
+<tr class="odd">
+<td align="left">France</td>
+</tr>
+<tr class="even">
+<td align="left">West Germany</td>
+</tr>
+<tr class="odd">
+<td align="left">Sweden</td>
+</tr>
+<tr class="even">
+<td align="left">Soviet Union</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(country) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 1
+##    country     
+##    &lt;chr&gt;       
+##  1 USA         
+##  2 Germany     
+##  3 Japan       
+##  4 Denmark     
+##  5 UK          
+##  6 Italy       
+##  7 France      
+##  8 West Germany
+##  9 Sweden      
+## 10 Soviet Union</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> certification</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">certification</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Not Rated</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">Passed</td>
+</tr>
+<tr class="even">
+<td align="left">Unrated</td>
+</tr>
+<tr class="odd">
+<td align="left">Approved</td>
+</tr>
+<tr class="even">
+<td align="left">G</td>
+</tr>
+<tr class="odd">
+<td align="left">PG</td>
+</tr>
+<tr class="even">
+<td align="left">R</td>
+</tr>
+<tr class="odd">
+<td align="left">PG-13</td>
+</tr>
+<tr class="even">
+<td align="left">M</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(certification) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 1
+##    certification
+##    &lt;chr&gt;        
+##  1 Not Rated    
+##  2 &lt;NA&gt;         
+##  3 Passed       
+##  4 Unrated      
+##  5 Approved     
+##  6 G            
+##  7 PG           
+##  8 R            
+##  9 PG-13        
+## 10 M</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> <span class="kw">role</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">roles</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>2 records</caption>
+<thead>
+<tr class="header">
+<th align="left">role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">director</td>
+</tr>
+<tr class="even">
+<td align="left">actor</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>roles <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(role) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 2 × 1
+##   role    
+##   &lt;chr&gt;   
+## 1 director
+## 2 actor</code></pre>
+</div>
+</div>
+</div>
+<div id="query-6-learning-to-count" class="section level2">
+<h2>Query 6: Learning to COUNT</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Count the number of rows in <code>people</code> table</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(*)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">8397</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Count the number of rows in <code>people</code> table</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() </span></code></pre></div>
+<pre><code>##      n
+## 1 8397</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Count the number of birth dates in the <code>people</code> table</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(birthdate)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(birthdate)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">8397</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Count the number of birth dates in the <code>people</code> table</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> <span class="fu">select</span>(birthdate) <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() </span></code></pre></div>
+<pre><code>##      n
+## 1 8397</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Count the number of DISTINCT birth dates in the <code>people</code> table</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> birthdate)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(DISTINCT birthdate)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">5399</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Count the number of DISTINCT birth dates in the <code>people</code> table</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> <span class="fu">select</span>(birthdate) <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">n_distinct</span>()</span></code></pre></div>
+<pre><code>## [1] 5399</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Count the number of DISTINCT languages in the <code>films</code> table</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> language)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(DISTINCT language)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">47</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Count the number of DISTINCT languages in the <code>films</code> table</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> <span class="fu">select</span>(language) <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">n_distinct</span>()</span></code></pre></div>
+<pre><code>## [1] 48</code></pre>
+</div>
+</div>
+<p>::::</p>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Count the number of DISTINCT languages in the <code>films</code> table</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> country)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(DISTINCT country)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">64</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Count the number of DISTINCT languages in the <code>films</code> table</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> <span class="fu">select</span>(country) <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">n_distinct</span>()</span></code></pre></div>
+<pre><code>## [1] 65</code></pre>
+</div>
+</div>
+</div>
+<div id="query-7-filtering-of-numeric-values" class="section level2">
+<h2>Query 7: Filtering of numeric values</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: selects all details for films with a budget over ten thousand dollars</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> budget <span class="op">&gt;</span> <span class="dv">10000</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>5 records</caption>
+<colgroup>
+<col width="2%" />
+<col width="40%" />
+<col width="10%" />
+<col width="6%" />
+<col width="7%" />
+<col width="7%" />
+<col width="11%" />
+<col width="6%" />
+<col width="6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">id</th>
+<th align="left">title</th>
+<th align="right">release_year</th>
+<th align="left">country</th>
+<th align="right">duration</th>
+<th align="left">language</th>
+<th align="left">certification</th>
+<th align="right">gross</th>
+<th align="right">budget</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">Intolerance: Love’s Struggle Throughout the Ages</td>
+<td align="right">1916</td>
+<td align="left">USA</td>
+<td align="right">123</td>
+<td align="left">NA</td>
+<td align="left">Not Rated</td>
+<td align="right">NA</td>
+<td align="right">385907</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">Over the Hill to the Poorhouse</td>
+<td align="right">1920</td>
+<td align="left">USA</td>
+<td align="right">110</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="right">3000000</td>
+<td align="right">100000</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">The Big Parade</td>
+<td align="right">1925</td>
+<td align="left">USA</td>
+<td align="right">151</td>
+<td align="left">NA</td>
+<td align="left">Not Rated</td>
+<td align="right">NA</td>
+<td align="right">245000</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">Metropolis</td>
+<td align="right">1927</td>
+<td align="left">Germany</td>
+<td align="right">145</td>
+<td align="left">German</td>
+<td align="left">Not Rated</td>
+<td align="right">26435</td>
+<td align="right">6000000</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">The Broadway Melody</td>
+<td align="right">1929</td>
+<td align="left">USA</td>
+<td align="right">100</td>
+<td align="left">English</td>
+<td align="left">Passed</td>
+<td align="right">2808000</td>
+<td align="right">379000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: selects all details for films with a budget over ten thousand dollars</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(budget <span class="sc">&gt;</span> <span class="dv">10000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 9
+##      id title       release_year country duration language certification   gross
+##   &lt;dbl&gt; &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;dbl&gt;
+## 1     1 Intoleranc…         1916 USA          123 &lt;NA&gt;     Not Rated          NA
+## 2     2 Over the H…         1920 USA          110 &lt;NA&gt;     &lt;NA&gt;          3000000
+## 3     3 The Big Pa…         1925 USA          151 &lt;NA&gt;     Not Rated          NA
+## 4     4 Metropolis          1927 Germany      145 German   Not Rated       26435
+## 5     6 The Broadw…         1929 USA          100 English  Passed        2808000
+## # … with 1 more variable: budget &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: selects all details for all films released in 2016</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> release_year <span class="op">=</span> <span class="dv">2016</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">title</th>
+<th align="right">release_year</th>
+<th align="left">country</th>
+<th align="right">duration</th>
+<th align="left">language</th>
+<th align="left">certification</th>
+<th align="right">gross</th>
+<th align="right">budget</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4821</td>
+<td align="left">10 Cloverfield Lane</td>
+<td align="right">2016</td>
+<td align="left">USA</td>
+<td align="right">104</td>
+<td align="left">English</td>
+<td align="left">PG-13</td>
+<td align="right">71897215</td>
+<td align="right">1.5e+07</td>
+</tr>
+<tr class="even">
+<td align="left">4822</td>
+<td align="left">13 Hours</td>
+<td align="right">2016</td>
+<td align="left">USA</td>
+<td align="right">144</td>
+<td align="left">English</td>
+<td align="left">R</td>
+<td align="right">52822418</td>
+<td align="right">5.0e+07</td>
+</tr>
+<tr class="odd">
+<td align="left">4823</td>
+<td align="left">A Beginner’s Guide to Snuff</td>
+<td align="right">2016</td>
+<td align="left">USA</td>
+<td align="right">87</td>
+<td align="left">English</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">4824</td>
+<td align="left">Airlift</td>
+<td align="right">2016</td>
+<td align="left">India</td>
+<td align="right">130</td>
+<td align="left">Hindi</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">4.4e+06</td>
+</tr>
+<tr class="odd">
+<td align="left">4825</td>
+<td align="left">Alice Through the Looking Glass</td>
+<td align="right">2016</td>
+<td align="left">USA</td>
+<td align="right">113</td>
+<td align="left">English</td>
+<td align="left">PG</td>
+<td align="right">76846624</td>
+<td align="right">1.7e+08</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: selects all details for all films released in 2016</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(release_year <span class="sc">==</span> <span class="dv">2016</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 9
+##      id title       release_year country duration language certification   gross
+##   &lt;dbl&gt; &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;dbl&gt;
+## 1  4821 10 Cloverf…         2016 USA          104 English  PG-13          7.19e7
+## 2  4822 13 Hours            2016 USA          144 English  R              5.28e7
+## 3  4823 A Beginner…         2016 USA           87 English  &lt;NA&gt;          NA     
+## 4  4824 Airlift             2016 India        130 Hindi    &lt;NA&gt;          NA     
+## 5  4825 Alice Thro…         2016 USA          113 English  PG             7.68e7
+## # … with 1 more variable: budget &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: selects number of films released before 2000</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(release_year)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> release_year <span class="op">&lt;</span><span class="dv">2000</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(release_year)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1337</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: selects number of films released before 2000</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(release_year <span class="sc">&lt;</span> <span class="dv">2000</span>) </span></code></pre></div>
+<pre><code>## # A tibble: 3 × 2
+##   `release_year &lt; 2000`     n
+##   &lt;lgl&gt;                 &lt;int&gt;
+## 1 FALSE                  3589
+## 2 TRUE                   1337
+## 3 NA                       42</code></pre>
+</div>
+</div>
+</div>
+<div id="query-8-filtering-text" class="section level2">
+<h2>Query 8: Filtering text</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: gets the titles of all films which were filmed in China</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> title</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> country <span class="op">=</span> <span class="st">&#39;China&#39;</span> <span class="co">-- in PostgreSQL you must use single quotes</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th align="left">title</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">The Last Emperor</td>
+</tr>
+<tr class="even">
+<td align="left">Hero</td>
+</tr>
+<tr class="odd">
+<td align="left">Hero</td>
+</tr>
+<tr class="even">
+<td align="left">House of Flying Daggers</td>
+</tr>
+<tr class="odd">
+<td align="left">The Promise</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: gets the titles of all films which were filmed in China</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">&quot;China&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># here you must use double quotes around text</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(title) <span class="sc">%&gt;%</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 1
+##   title                  
+##   &lt;chr&gt;                  
+## 1 The Last Emperor       
+## 2 Hero                   
+## 3 Hero                   
+## 4 House of Flying Daggers
+## 5 The Promise</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: gets all the details for all French language films</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> language <span class="op">=</span> <span class="st">&#39;French&#39;</span> <span class="co">-- in PostgreSQL you must use single quotes</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>5 records</caption>
+<thead>
+<tr class="header">
+<th align="right">id</th>
+<th align="left">title</th>
+<th align="right">release_year</th>
+<th align="left">country</th>
+<th align="right">duration</th>
+<th align="left">language</th>
+<th align="left">certification</th>
+<th align="right">gross</th>
+<th align="right">budget</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">108</td>
+<td align="left">Une Femme Mariée</td>
+<td align="right">1964</td>
+<td align="left">France</td>
+<td align="right">94</td>
+<td align="left">French</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">1.2e+05</td>
+</tr>
+<tr class="even">
+<td align="right">111</td>
+<td align="left">Pierrot le Fou</td>
+<td align="right">1965</td>
+<td align="left">France</td>
+<td align="right">110</td>
+<td align="left">French</td>
+<td align="left">Not Rated</td>
+<td align="right">NA</td>
+<td align="right">3.0e+05</td>
+</tr>
+<tr class="odd">
+<td align="right">140</td>
+<td align="left">Mississippi Mermaid</td>
+<td align="right">1969</td>
+<td align="left">France</td>
+<td align="right">123</td>
+<td align="left">French</td>
+<td align="left">R</td>
+<td align="right">26893</td>
+<td align="right">1.6e+06</td>
+</tr>
+<tr class="even">
+<td align="right">423</td>
+<td align="left">Subway</td>
+<td align="right">1985</td>
+<td align="left">France</td>
+<td align="right">98</td>
+<td align="left">French</td>
+<td align="left">R</td>
+<td align="right">NA</td>
+<td align="right">1.7e+07</td>
+</tr>
+<tr class="odd">
+<td align="right">662</td>
+<td align="left">Les visiteurs</td>
+<td align="right">1993</td>
+<td align="left">France</td>
+<td align="right">107</td>
+<td align="left">French</td>
+<td align="left">R</td>
+<td align="right">700000</td>
+<td align="right">5.0e+07</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: gets all the details for all French language films</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(language <span class="sc">==</span> <span class="st">&quot;French&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># here you must use double quotes around text</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 9
+##      id title release_year country duration language certification  gross budget
+##   &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;  &lt;dbl&gt;
+## 1   108 Une …         1964 France        94 French   &lt;NA&gt;              NA  1.2e5
+## 2   111 Pier…         1965 France       110 French   Not Rated         NA  3  e5
+## 3   140 Miss…         1969 France       123 French   R              26893  1.6e6
+## 4   423 Subw…         1985 France        98 French   R                 NA  1.7e7
+## 5   662 Les …         1993 France       107 French   R             700000  5  e7</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Get the name and birth date of the person born on November 11th, 1974.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> name birthdate</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> people</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> birthdate <span class="op">=</span> <span class="st">&#39;1974-11-11&#39;</span> <span class="co">-- in PostgreSQL you must use single quotes</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">5</span>;</span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>0 records</caption>
+<thead>
+<tr class="header">
+<th align="left">birthdate</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Get the name and birth date of the person born on November 11th, 1974.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>people <span class="sc">%&gt;%</span> </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name, birthdate) <span class="sc">%&gt;%</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(birthdate <span class="sc">==</span> <span class="st">&quot;1974-11-11&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># here you must use double quotes around text</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code></pre></div>
+<pre><code>## [1] name      birthdate
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;">
+<div>
+<p>SQL code: Get the number of Hindi language films</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(language)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> films</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> language <span class="op">=</span> <span class="st">&#39;Hindi&#39;</span>; <span class="co">-- in PostgreSQL you must use single quotes</span></span></code></pre></div>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">COUNT(language)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div>
+<p>R code: Get the number of Hindi language films</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>films <span class="sc">%&gt;%</span> </span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(language <span class="sc">==</span> <span class="st">&quot;Hindi&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># here you must use double quotes around text</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 1
+##       n
+##   &lt;int&gt;
+## 1    28</code></pre>
+</div>
+</div>
+</div>
+<div id="query-9-use-where-and-and-for-multiple-conditions" class="section level2">
+<h2>Query 9: Use WHERE and AND for multiple conditions</h2>
 </div>
 
 
