@@ -11,6 +11,9 @@ output:
     highlight: zenburn
 ---
 
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
 <!--
 :::: {style="display: grid;"} ### this code if you add below will display one after the other top and bottom.
 
@@ -33,12 +36,20 @@ films <- read_excel("films.xlsx")
 people <- read.csv("people.csv")
 reviews <- read_excel("reviews.xlsx")
 roles <- read_excel("roles.xlsx")
+#joining data in sql - data
+cities <- read_excel("cities.xlsx")
+countries <- read_excel("countries.xlsx")
+economies <- read_excel("economies.xlsx")
+languages <- read_excel("languages.xlsx")
+populations <- read_excel("populations.xlsx")
 
 library(odbc)
 library(DBI)
 library(RSQL)
 library(RSQLite)
 library(tidyverse)
+library(data.table)
+library(reprex)
 
 con <- dbConnect(drv = RSQLite::SQLite(),
                  dbname = ":memory:")
@@ -55,10 +66,27 @@ dbWriteTable(conn = con,
 dbWriteTable(conn = con,
              name = "roles",
              value = roles)
+dbWriteTable(conn = con,
+             name = "cities",
+             value = cities)
+dbWriteTable(conn = con,
+             name = "countries",
+             value = countries)
+dbWriteTable(conn = con,
+             name = "economies",
+             value = economies)
+dbWriteTable(conn = con,
+             name = "languages",
+             value = languages)
+dbWriteTable(conn = con,
+             name = "populations",
+             value = populations)
 #dbListTables(con)
 #dbListFields(con, "people")
 ```
 
+
+# Introduction to SQL
 
 ## Query 1: SELECTing single columns
 
@@ -875,3 +903,1140 @@ films %>%
 :::
 
 ::::
+
+## Query 12: `BETWEEN` with `AND` and `OR` 
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: `BETWEEN` is used to filter values in a specified range and it is always inclusive
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE release_year
+BETWEEN 1994 AND 2000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: `between` is used in filter our values based on a range of values
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(between(release_year, 1994, 2000))%>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: `BETWEEN` when used with both `AND` and `OR`
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE release_year BETWEEN 1990 AND 2000
+AND language = 'Spanish'
+AND budget > 100000000
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(between(release_year, 1990, 2000) &
+           language == "Spanish" &
+           budget > 100000000)%>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+## Query 13: `WHERE IN`
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: If you have many either or conditions on a column, we need to specify several `OR` conditions using `WHERE`. Instead we can used `WHERE IN`.
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE release_year IN (1990, 2000)
+AND duration > 120
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(release_year %in% c(1990, 2000) &
+           duration > 120) %>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: 
+
+```{sql, connection=con}
+SELECT title, release_year
+FROM films
+WHERE language IN ('English', 'Spanish', 'French')
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(language %in% c("English", "Spanish", "French")) %>%
+  select(title, release_year) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: 
+
+```{sql, connection=con}
+SELECT title, certification
+FROM films
+WHERE certification IN ('NC-17', 'R')
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(certification %in% c("NC-17", "R")) %>%
+  select(title, certification) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 14: Intro to `NULL` and `IS NULL`
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: In SQL, `NULL` represents a missing or unknown value. One can check `NULL` values using `IS NULL`. For example, to count the number of missing birth dates in the people table;
+
+```{sql, connection=con}
+SELECT COUNT(*)
+FROM people
+WHERE birthdate IS NULL
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  filter(is.na(birthdate)) %>% count() %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Sometimes, you will want to filter out missing values so you only get results which are not NULL. To do this, you can use the IS NOT NULL operator.
+
+```{sql, connection=con}
+SELECT name
+FROM people
+WHERE birthdate IS NOT NULL
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  filter(!is.na(birthdate)) %>% 
+  select(name) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the number of films which don't have a language associated with them
+
+```{sql, connection=con}
+SELECT COUNT(*)
+FROM films
+WHERE language IS NULL
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(is.na(language)) %>% count() %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 15: Aggregate Functions
+
+Essentially SQL has some aggregate functions that you can perform on your variables.
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: The following query gives the average value from the budget column of the films table.
+
+```{sql, connection=con}
+SELECT AVG(budget) AS budget_ave
+FROM films
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  summarize(budget_avg = mean(budget, na.rm = TRUE)) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: The following query gives the maximum value from the budget column of the films table.
+
+```{sql, connection=con}
+SELECT MAX(budget) AS budget_max
+FROM films
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  summarize(budget_max = max(budget, na.rm = TRUE)) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: The following query gives the minimum value from the budget column of the films table.
+
+```{sql, connection=con}
+SELECT MIN(budget) AS budget_min
+FROM films
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  summarize(budget_min = min(budget, na.rm = TRUE)) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: The following query gives the minimum value from the budget column of the films table.
+
+```{sql, connection=con}
+SELECT SUM(budget) AS budget_sum
+FROM films
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  summarize(budget_sum = sum(budget, na.rm = TRUE)) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 16: Combining Aggregate functions with WHERE
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets the total budget of movies made in the year 2010 or later.
+
+```{sql, connection=con}
+SELECT SUM(budget) 
+FROM films
+WHERE release_year >=2010
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(release_year >= 2010) %>%
+  summarize(budget_sum = sum(budget, na.rm = TRUE)) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the amount grossed by the best performing film between 2000 and 2012, inclusive.
+
+```{sql, connection=con}
+SELECT MAX(gross) 
+FROM films
+WHERE release_year BETWEEN 2000 AND 2012
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>% 
+  filter(between(release_year, 2000, 2012)) %>%
+  summarize(gross_max = max(gross, na.rm = TRUE)) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+<!--
+## Query 17: A Note on Arithmetic
+
+In addition to using aggregate functions, you can perform basic arithmetic with symbols like `+, -, *, and /`.
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: The following gives a result of 12
+
+```{sql, connection=con}
+SELECT (4 * 3)
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+(4 * 3)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: However, the following query gives a result of 1. This is because SQL assumes that if you divide an integer by an integer, you want to get an integer back. So, we need to be very careful while dividing in SQL. If you want more precision when dividing, you can add decimal places to your numbers
+
+```{sql, connection=con}
+SELECT (4 / 3)
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+as.integer(4 / 3)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: If you want more precision when dividing, you can add decimal places to your numbers
+
+```{sql, connection=con}
+SELECT (4.0 / 3.0)
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+(4 / 3)
+```
+:::
+
+::::
+-->
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the number of decades the films table covers. Alias the result as number_of_decades. 
+
+```{sql, connection=con}
+SELECT (MAX(release_year) - MIN(release_year)) / 10 AS number_of_decades
+FROM films
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  summarize(number_of_decades = (max(release_year, na.rm = TRUE) - 
+                                   min(release_year, na.rm = TRUE)) / 10) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 17: Sorting and Grouping
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: In SQL, the `ORDER BY` keyword is used to sort results in ascending or descending order according to the values of one or more columns. By default `ORDER BY` will sort in ascending order. In order to sort the results in descending order, you can use `DESC` order. 
+
+For example, the following query gives you the titles of films sorted by release year, from newest to oldest.
+
+```{sql, connection=con}
+SELECT title
+FROM films
+ORDER BY release_year DESC
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Analogous verb in R for sorting is `arrange`. For `arrange` the default is ascending but for getting descending order `desc` can be used like in SQL.
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  arrange(desc(release_year)) %>%
+  select(title) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: For text values, ORDER BY sorts a column by default alphabetically (A to Z)
+
+```{sql, connection=con}
+SELECT name
+FROM people
+ORDER BY name
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+people %>%
+  arrange(name) %>%
+  select(name) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the title of films released in 2000 or 2012, in the order they were released.
+
+```{sql, connection=con}
+SELECT title
+FROM films
+WHERE release_year IN (2000, 2012)
+ORDER BY release_year
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the title of films released in 2000 or 2012, in the order they were released.
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  filter(release_year %in% c(2000, 2012)) %>%
+  arrange(release_year) %>%
+  select(title) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get all details for all films except those released in 2015 and order them by duration.
+
+```{sql, connection=con}
+SELECT *
+FROM films
+WHERE release_year < 2015
+OR release_year > 2015
+ORDER BY duration
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get all details for all films except those released in 2015 and order them by duration.
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  filter(release_year < 2015 | release_year > 2015) %>%
+  arrange(duration) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 18: SORTING single columns by DESC
+
+To order results in descending order, you can put the keyword `DESC` after your `ORDER BY`. 
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets all the names in the people table, in reverse alphabetical order.
+
+```{sql, connection=con}
+SELECT name
+FROM people
+ORDER BY name DESC
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Gets all the names in the people table, in reverse alphabetical order.
+
+```{r warning=FALSE, message=FALSE}
+people %>%
+  arrange(desc(name)) %>%
+  select(name) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 19: SORTING multiple columns
+
+ORDER BY can also be used to sort on multiple columns. It will sort by the first column specified, then sort by the next, then the next, and so on. For example, the following query sorts birth dates first (oldest to newest) and then sorts on the names in alphabetical order. THE ORDER OF COLUMNS IS IMPORTANT!
+
+Note: To specify multiple columns you separate the column names with a comma. 
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets all the names in the people table, in reverse alphabetical order.
+
+```{sql, connection=con}
+SELECT birthdate, name
+FROM people
+ORDER BY birthdate, name
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Gets all the names in the people table, in reverse alphabetical order.
+
+```{r warning=FALSE, message=FALSE}
+people %>%
+  arrange(birthdate, name) %>%
+  select(birthdate, name) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the `names` and `birthdates` of people ordered by name and birth date. Notice how the second column you order on only steps in when the first column is not decisive to tell the order. The second column acts as a tie breaker
+
+```{sql, connection=con}
+SELECT name, birthdate
+FROM people
+ORDER BY name, birthdate
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the `names` and `birthdates` of people ordered by name and birth date. Notice how the second column you order on only steps in when the first column is not decisive to tell the order. The second column acts as a tie breaker
+
+```{r warning=FALSE, message=FALSE}
+people %>%
+  arrange(name, birthdate) %>%
+  select(name, birthdate) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 20: GROUP BY
+
+- We saw `ORDER BY` for sorting. Here we use `GROUP BY` for aggregating results.
+- Commonly, `GROUP BY` is used with aggregate functions like `COUNT()` or `MAX()`. 
+- Note that `GROUP BY` always goes after the `FROM` clause!
+- Overall, `GROUP BY` is performing operations within groups.
+- Warning: SQL will return an error if you try to `SELECT` a field that is not in your `GROUP BY` clause without using it to calculate some kind of value about the entire group.
+- Note that you can combine `GROUP BY` with `ORDER BY` to group your results, calculate something about them, and then order your results. 
+- **NOTE**: `ORDER BY` always goes after `GROUP BY`
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Gets the release year and count of films released in each year
+
+```{sql, connection=con}
+SELECT release_year, COUNT(*)
+FROM films
+GROUP BY release_year
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Gets the release year and count of films released in each year
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  group_by(release_year) %>% 
+  select(release_year) %>% count() %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the release year and average duration of all films, grouped by release year
+
+```{sql, connection=con}
+SELECT release_year, AVG(duration)
+FROM films
+GROUP BY release_year
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the release year and average duration of all films, grouped by release year
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  group_by(release_year) %>% summarize(duration_avg = mean(duration)) %>%
+  select(release_year, duration_avg) %>% 
+  head(n = 5)
+```
+:::
+
+::::
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the release year and largest budget for all films, grouped by release year
+
+```{sql, connection=con}
+SELECT release_year, MAX(budget)
+FROM films
+GROUP BY release_year
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the release year and largest budget for all films, grouped by release year
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  group_by(release_year) %>% summarize(budget_max = max(budget)) %>%
+  select(release_year, budget_max) %>% 
+  head(n = 5)
+```
+:::
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the country, release year, and lowest amount grossed per release year per country. Order your results by country and release year.
+
+```{sql, connection=con}
+SELECT country, release_year, MIN(gross)
+FROM films
+GROUP BY release_year, country
+ORDER BY country, release_year
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the country, release year, and lowest amount grossed per release year per country. Order your results by country and release year.
+
+```{r warning=FALSE, message=FALSE}
+films %>%
+  group_by(release_year, country) %>% summarize(gross_min = min(gross)) %>%
+  arrange(country, release_year) %>%
+  select(country, release_year, gross_min) %>% 
+  head(n = 5)
+```
+:::
+
+::::
+
+
+
+
+<!--
+## Query 21: HAVING (REVISIT THIS)
+
+- In SQL, aggregate functions can't be used in `WHERE` clauses.
+- This means that you want to filter based on the result of an aggregate function, you need another way!
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: the following query shows only those years in which > 10
+
+```{sql, connection=con}
+SELECT release_year
+FROM films
+GROUP BY release_year
+HAVING COUNT(title) > 10;
+--LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: the following query shows only those years in which > 10
+```{r warning=FALSE, message=FALSE}
+#films %>%
+#  count(title) %>%
+#  group_by(release_year) %>% #count(title) %>% 
+#  #mutate(n  = count(title)) %>%
+#  filter(n > 10) %>%
+#  select(release_year) #%>% 
+#  #head(n = 5)
+```
+:::
+
+::::
+-->
+
+<!--
+## Query 15: `LIKE` and `NOT LIKE`
+
+`WHERE` clause can be used to filter text data. However, so far you have been able to filter by specifying the exact text you have interested in. In the real world, often you will want to search for a pattern rather than a specific text string.
+
+In SQL, the `LIKE` operator can be used in a `WHERE` clause to search for a pattern in a column. To accomplish this, you use something called a wildcard as a placeholder for some other values. There are two wildcards: `_` and `%`.
+
+One can use `NOT LIKE` operator to find records that don't match the pattern you specify.
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: Get the names of all people whose names begin with `B`. 
+
+```{sql, connection=con}
+SELECT name
+FROM people
+WHERE name LIKE 'B%'
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: Get the names of all people whose names begin with `B`. 
+
+```{r warning=FALSE, message=FALSE}
+people %>% 
+  filter(name %like% "B%") %>% 
+  select(name) %>%
+  head(n = 5)
+```
+:::
+
+::::
+-->
+
+# Joining Data
+
+## Query 21: INNER JOINS
+
+- `INNER JOIN` and `LEFT JOIN`  are probably the two most common joins.
+- `id` field is called `key` since it is used to reference both the left and right tables
+- `INNER JOIN` gathers the value columns from both the left and right tables with common `key` `ids` in both.
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: INNER JOIN and SELECTing all columns
+
+```{sql, connection=con}
+SELECT city.name AS city, country.region AS region
+FROM cities AS city
+  -- Inner join to countries
+  INNER JOIN countries AS country
+  -- Match on the country codes
+  ON city.country_code = country.code
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: INNER JOIN and SELECTing all columns
+
+```{r warning=FALSE, message=FALSE}
+cities %>%
+  inner_join(countries, by = c("country_code" = "code")) %>%
+  select(city = name, region) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 22: INNER JOINS - 2
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: 
+
+```{sql, connection=con}
+SELECT c.code AS country_code, year, inflation_rate
+FROM countries AS c
+  INNER JOIN economies AS e
+  ON c.code = e.code
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+countries %>%
+  inner_join(economies, by = "code") %>%
+  select(country_code = code, year, inflation_rate) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+
+## Query 23: INNER JOIN via USING
+
+::::
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: 
+
+```{sql, connection=con}
+SELECT c.continent, l.name AS language, l.official
+FROM countries AS c
+  INNER JOIN languages AS l
+  USING (code)
+LIMIT 5;
+```
+
+:::
+
+::: {}
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+countries %>%
+  inner_join(languages, by = "code") %>%
+  select(continent, language = name, official) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
+## Query 24: CASE WHEN and THEN
+
+- Often it's useful to look at a numerical field not as raw data, but instead as being in different categories or groups.
+- You can use `CASE` with `WHEN`, `THEN`, `ELSE`, and `END` to define a new grouping field.
+
+::::
+
+
+
+:::: {style="display: grid; grid-template-columns: 1fr 1fr; grid-column-gap: 10px;"}
+
+
+::: {}
+
+SQL code: 
+
+```{sql, connection=con}
+SELECT continent, code, surface_area,
+    CASE WHEN surface_area > 2000000 THEN 'large'
+        WHEN surface_area > 350000 AND surface_area < 2000000 THEN 'medium'
+        ELSE 'small' END
+        AS geosize_group
+FROM countries
+LIMIT 5;
+```
+
+:::
+
+::: {}
+
+R code: 
+
+```{r warning=FALSE, message=FALSE}
+countries %>%
+  mutate(geosize_group = case_when(
+    surface_area > 2000000 ~ "large",
+    surface_area > 350000 & surface_area < 2000000 ~ "medium",
+    surface_area < 350000 ~ "small"
+  )) %>%
+  select(continent, code, surface_area, geosize_group) %>%
+  head(n = 5)
+```
+:::
+
+::::
+
